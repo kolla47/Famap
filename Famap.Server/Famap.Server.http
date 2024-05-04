@@ -1,0 +1,6 @@
+@Famap.Server_HostAddress = http://localhost:5158
+
+GET {{Famap.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
