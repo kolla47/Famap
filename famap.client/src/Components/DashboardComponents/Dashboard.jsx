@@ -1,6 +1,5 @@
-import { Box, Button, ButtonGroup, Grid, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Typography } from "@mui/material";
 import { useState, useEffect, useMemo } from "react";
-import PeopleCard from "../PeopleCard/PeopleCard";
 import ReactFlow, {
   useNodesState,
   useEdgesState,
@@ -13,7 +12,7 @@ import PeopleNode from "../PeopleCard/PeopleNode";
 import DevTools from "../DevTools/DevTools";
 
 const Dashboard = () => {
-  const [peopleData, setPeopleData] = useState([]);
+  // const [peopleData, setPeopleData] = useState([]);
 
   const [variant, setVariant] = useState("none");
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -34,21 +33,69 @@ const Dashboard = () => {
     };
 
     const GetEdges = (res) => {
-      // Create edges for each parent-child relationship
-      let edges = [];
-      // father
-
-      // mother
+      // Create edges form Source handles
       // spouse
-      // children
-
-      setEdges(edges);
-    };
+      let curEdges = [];
+      res.forEach((person) => {
+        if (person.spouseId) {
+          if (person.gender === "Male") {
+            curEdges.push({
+              id: `H-${person.id}-W-${person.spouseId}`,
+              style: { stroke: "#555" },
+              source: person.id,
+              target: person.spouseId,
+              sourceHandle: `H-${person.id}`,
+              targetHandle: `W-${person.spouseId}`,
+              type: "default",
+              markerEnd: "arrowclosed", //TODO
+              animated: true,
+            });
+          }
+        }
+      });
+      // children by father
+      res.forEach((person) => {
+        if (person.fatherOf.length > 0) {
+          person.fatherOf.forEach((child) => {
+            curEdges.push({
+              id: `P-${person.id}-C-${child.id}`,
+              style: { stroke: "#555" },
+              source: person.id,
+              target: child.id,
+              sourceHandle: `F-${person.id}-C-${child.id}`,
+              targetHandle: `FC-${child.id}`,
+              type: "default",
+              markerEnd: "arrowclosed", //TODO
+              animated: true,
+            });
+          });
+        }
+      });
+      // Child by mother
+      res.forEach((person) => {
+        if (person.motherOf.length > 0) {
+          person.motherOf.forEach((child) => {
+            curEdges.push({
+              id: `P-${person.id}-C-${child.id}`,
+              style: { stroke: "#555" },
+              source: person.id,
+              target: child.id,
+              sourceHandle: `M-${person.id}-C-${child.id}`,
+              targetHandle: `MC-${child.id}`,
+              type: "default",
+              markerEnd: "arrowclosed", //TODO
+              animated: true,
+            });
+          });
+        }
+      });
+      setEdges(curEdges);
+    }; // Remove extra semicolon here
 
     fetch("people")
       .then((response) => response.json())
       .then((data) => {
-        setPeopleData(data);
+        // setPeopleData(data);
         GetNodes(data);
         GetEdges(data);
       });

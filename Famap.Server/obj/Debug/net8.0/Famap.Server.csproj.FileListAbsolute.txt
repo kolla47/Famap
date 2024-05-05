@@ -253,3 +253,4 @@ C:\Users\akhil\source\repos\Famap\Famap.Server\bin\Debug\net8.0\runtimes\win\lib
 C:\Users\akhil\source\repos\Famap\Famap.Server\bin\Debug\net8.0\runtimes\win\lib\net7.0\System.Drawing.Common.dll
 C:\Users\akhil\source\repos\Famap\Famap.Server\bin\Debug\net8.0\runtimes\win\lib\net7.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\akhil\source\repos\Famap\Famap.Server\bin\Debug\net8.0\runtimes\win\lib\net7.0\System.Windows.Extensions.dll
+C:\Users\akhil\source\repos\Famap\Famap.Server\obj\Debug\net8.0\Famap.Server.sourcelink.json
