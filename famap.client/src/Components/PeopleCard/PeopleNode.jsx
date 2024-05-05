@@ -10,7 +10,6 @@ const PeopleNode = (props) => {
       : 100 / (personData.motherOf.length + 1);
 
   const GetChildHandles = (data) => {
-    console.log(data, "data");
     if (data.length > 0) {
       return data.map((child, index) => (
         <Handle

@@ -1,5 +1,3 @@
-import { Box, Button, ButtonGroup, Typography } from "@mui/material";
-import { useState, useEffect, useMemo } from "react";
 import ReactFlow, {
   useNodesState,
   useEdgesState,
@@ -8,107 +6,101 @@ import ReactFlow, {
   Background,
   Panel,
 } from "reactflow";
+import { Box, Button, ButtonGroup, Typography } from "@mui/material";
+import { useState, useEffect, useMemo } from "react";
 import PeopleNode from "../PeopleCard/PeopleNode";
 import DevTools from "../DevTools/DevTools";
 
 const Dashboard = () => {
-  // const [peopleData, setPeopleData] = useState([]);
-
   const [variant, setVariant] = useState("none");
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const nodeTypes = useMemo(() => ({ peopleNode: PeopleNode }), []);
 
-  // create an counter and add 250 to x of each node
-
   useEffect(() => {
-    const GetNodes = (res) => {
-      const nodes = res.map((person, index) => ({
-        id: person.id,
-        data: person,
-        type: "peopleNode",
-        position: { x: index * 300, y: 0 },
-      }));
-      setNodes(nodes);
+    const fetchPeopleData = async () => {
+      try {
+        const response = await fetch("people");
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error("Error fetching people data:", error);
+        return [];
+      }
     };
 
-    const GetEdges = (res) => {
-      // Create edges form Source handles
-      // spouse
-      let curEdges = [];
-      res.forEach((person) => {
-        if (person.spouseId) {
-          if (person.gender === "Male") {
-            curEdges.push({
-              id: `H-${person.id}-W-${person.spouseId}`,
-              style: { stroke: "#555" },
-              source: person.id,
-              target: person.spouseId,
-              sourceHandle: `H-${person.id}`,
-              targetHandle: `W-${person.spouseId}`,
-              type: "default",
-              markerEnd: "arrowclosed", //TODO
-              animated: true,
-            });
-          }
-        }
-      });
-      // children by father
-      res.forEach((person) => {
-        if (person.fatherOf.length > 0) {
-          person.fatherOf.forEach((child) => {
-            curEdges.push({
-              id: `P-${person.id}-C-${child.id}`,
-              style: { stroke: "#555" },
-              source: person.id,
-              target: child.id,
-              sourceHandle: `F-${person.id}-C-${child.id}`,
-              targetHandle: `FC-${child.id}`,
-              type: "default",
-              markerEnd: "arrowclosed", //TODO
-              animated: true,
-            });
-          });
-        }
-      });
-      // Child by mother
-      res.forEach((person) => {
-        if (person.motherOf.length > 0) {
-          person.motherOf.forEach((child) => {
-            curEdges.push({
-              id: `P-${person.id}-C-${child.id}`,
-              style: { stroke: "#555" },
-              source: person.id,
-              target: child.id,
-              sourceHandle: `M-${person.id}-C-${child.id}`,
-              targetHandle: `MC-${child.id}`,
-              type: "default",
-              markerEnd: "arrowclosed", //TODO
-              animated: true,
-            });
-          });
-        }
-      });
-      setEdges(curEdges);
-    }; // Remove extra semicolon here
+    const generatePersonNode = (person, index) => ({
+      id: person.id,
+      data: person,
+      type: "peopleNode",
+      position: { x: index * 300, y: 0 },
+    });
 
-    fetch("people")
-      .then((response) => response.json())
+    const generateEdge = (id, source, target, sourceHandle, targetHandle) => ({
+      id,
+      style: { stroke: "#555" },
+      source,
+      target,
+      sourceHandle,
+      targetHandle,
+      type: "default",
+      markerEnd: "arrowclosed",
+      animated: true,
+    });
+
+    const generateSpouseEdges = (people) =>
+      people
+        .filter((person) => person.spouseId && person.gender === "Male")
+        .map((person) =>
+          generateEdge(
+            `H-${person.id}-W-${person.spouseId}`,
+            person.id,
+            person.spouseId,
+            `H-${person.id}`,
+            `W-${person.spouseId}`
+          )
+        );
+
+    const generateParentChildEdges = (
+      people,
+      relationship,
+      sourceHandlePrefix,
+      targetHandlePrefix
+    ) =>
+      people.flatMap((person) =>
+        person[relationship].map((child) =>
+          generateEdge(
+            `P-${person.id}-C-${child.id}`,
+            person.id,
+            child.id,
+            `${sourceHandlePrefix}-${person.id}-C-${child.id}`,
+            `${targetHandlePrefix}-${child.id}`
+          )
+        )
+      );
+
+    const getNodes = (people) => people.map(generatePersonNode);
+
+    const getEdges = (people) => [
+      ...generateSpouseEdges(people),
+      ...generateParentChildEdges(people, "fatherOf", "F", "FC"),
+      ...generateParentChildEdges(people, "motherOf", "M", "MC"),
+    ];
+
+    fetchPeopleData()
       .then((data) => {
-        // setPeopleData(data);
-        GetNodes(data);
-        GetEdges(data);
-      });
+        setNodes(getNodes(data));
+        setEdges(getEdges(data));
+      })
+      .catch((error) => console.error("Error setting nodes and edges:", error));
   }, [setEdges, setNodes]);
 
+  const handleVariantChange = (newVariant) => {
+    setVariant(newVariant);
+  };
+
   return (
-    <Box
-      sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <Typography
         variant="h4"
         gutterBottom
@@ -145,10 +137,14 @@ const Dashboard = () => {
           <Panel>
             <Box>Background :</Box>
             <ButtonGroup variant="contained" aria-label="Basic button group">
-              <Button onClick={() => setVariant("none")}>white</Button>
-              <Button onClick={() => setVariant("dots")}>dots</Button>
-              <Button onClick={() => setVariant("lines")}>lines</Button>
-              <Button onClick={() => setVariant("cross")}>cross</Button>
+              <Button onClick={() => handleVariantChange("none")}>white</Button>
+              <Button onClick={() => handleVariantChange("dots")}>dots</Button>
+              <Button onClick={() => handleVariantChange("lines")}>
+                lines
+              </Button>
+              <Button onClick={() => handleVariantChange("cross")}>
+                cross
+              </Button>
             </ButtonGroup>
           </Panel>
         </ReactFlow>
