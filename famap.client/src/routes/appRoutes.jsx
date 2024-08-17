@@ -1,6 +1,5 @@
 import { Route, Redirect } from "react-router-dom";
-import Dashboard from "../Components/DashboardComponents/Dashboard";
-
+import Dashboard from "../Components/Dashboard/Dashboard";
 // Define your route components here
 
 // Define your route guard component

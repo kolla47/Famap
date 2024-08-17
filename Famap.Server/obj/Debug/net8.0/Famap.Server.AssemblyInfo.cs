@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Famap.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+287d189594fbc905824dd40dfd8b807eb3b7c368")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+08f9259031e044f182ecb400721126baf367fa4b")]
 [assembly: System.Reflection.AssemblyProductAttribute("Famap.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Famap.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
