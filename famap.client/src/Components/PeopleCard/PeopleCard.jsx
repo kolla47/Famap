@@ -5,7 +5,6 @@ import {
   CardContent,
   Collapse,
   Grid,
-  IconButton,
   Typography,
 } from "@mui/material";
 import { ExpandMore, ExpandLess, Email, Phone } from "@mui/icons-material";
@@ -14,16 +13,39 @@ import "reactflow/dist/style.css";
 const PeopleCard = ({ person }) => {
   const [expanded, setExpanded] = useState(false);
 
-  const toggleExpanded = () => {
-    setExpanded(!expanded);
-  };
+  const toggleExpanded = () => setExpanded((prev) => !prev);
 
-  // Calculate font size based on name length
   const getFontSize = (name) => {
     if (name.length <= 10) return "h6";
     if (name.length <= 15) return "subtitle1";
     return "subtitle2";
   };
+
+  const InfoItem = ({ icon: Icon, text, href }) => (
+    <Grid container alignItems="center" justifyContent="center">
+      <Grid item>
+        <Icon sx={{ marginRight: 1 }} />
+      </Grid>
+      <Grid item>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          gutterBottom
+          component="a"
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {text}
+        </Typography>
+      </Grid>
+    </Grid>
+  );
+
+  const genderGradient =
+    person.gender === "Male"
+      ? "linear-gradient(to bottom, #64b5f6, #bbdefb)" // Blue gradient for males
+      : "linear-gradient(to bottom, #f48fb1, #fce4ec)"; // Pink gradient for females
 
   return (
     <Card
@@ -37,7 +59,7 @@ const PeopleCard = ({ person }) => {
           boxShadow:
             "0px 2px 4px rgba(0, 0, 0, 0.2), 0px 4px 8px rgba(0, 0, 0, 0.1)",
         },
-        background: "linear-gradient(to bottom, #64b5f6, #bbdefb)",
+        background: genderGradient,
         borderRadius: 8,
         overflow: "hidden",
       }}
@@ -47,39 +69,28 @@ const PeopleCard = ({ person }) => {
         <Grid
           container
           alignItems="center"
-          justifyContent="space-between" // Align items at start and end of container
-          sx={{
-            flexGrow: 1,
-          }}
+          justifyContent="space-between"
+          sx={{ flexGrow: 1 }}
         >
-          <Grid item>
-            <Avatar
-              sx={{
-                width: 35,
-                height: 35,
-                mr: 3,
-                backgroundColor: "#ffffff",
-                color: "#1976d2",
-              }}
-            >
-              {person.name.charAt(0)}
-            </Avatar>
-          </Grid>
-          <Grid item>
-            <Typography
-              variant={getFontSize(person.name)}
-              component="div"
-              align="center"
-              gutterBottom={false}
-            >
-              {person.name}
-            </Typography>
-          </Grid>
-          <Grid item>
-            <IconButton>
-              {expanded ? <ExpandLess /> : <ExpandMore />}
-            </IconButton>
-          </Grid>
+          <Avatar
+            sx={{
+              width: 35,
+              height: 35,
+              mr: 3,
+              backgroundColor: "#ffffff",
+              color: "#1976d2",
+            }}
+          >
+            {person.name.charAt(0)}
+          </Avatar>
+          <Typography
+            variant={getFontSize(person.name)}
+            component="div"
+            align="center"
+          >
+            {person.name}
+          </Typography>
+          {expanded ? <ExpandLess /> : <ExpandMore />}
         </Grid>
 
         <Collapse in={expanded} timeout="auto" unmountOnExit>
@@ -92,53 +103,27 @@ const PeopleCard = ({ person }) => {
           >
             <Grid item xs={12}>
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                Date of Birth: {person.dateOfBirth}
+                Date of Birth: {person.dateOfBirth || "N/A"}
               </Typography>
             </Grid>
             <Grid item xs={12}>
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                Gender: {person.gender}
+                Gender: {person.gender || "N/A"}
               </Typography>
             </Grid>
             {person.email && (
-              <Grid container justifyContent="center">
-                <Grid item>
-                  <Email sx={{ marginRight: 1 }} />
-                </Grid>
-                <Grid item>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                    component="a"
-                    href={`mailto:${person.email}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {person.email}
-                  </Typography>
-                </Grid>
-              </Grid>
+              <InfoItem
+                icon={Email}
+                text={person.email}
+                href={`mailto:${person.email}`}
+              />
             )}
             {person.phoneNumber && (
-              <Grid container justifyContent="center">
-                <Grid item>
-                  <Phone sx={{ marginRight: 1 }} />
-                </Grid>
-                <Grid item>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                    component="a"
-                    href={`tel:${person.phoneNumber}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {person.phoneNumber}
-                  </Typography>
-                </Grid>
-              </Grid>
+              <InfoItem
+                icon={Phone}
+                text={person.phoneNumber}
+                href={`tel:${person.phoneNumber}`}
+              />
             )}
           </Grid>
         </Collapse>

@@ -10,19 +10,15 @@ const Layout = ({ children }) => {
     >
       <CssBaseline />
 
-      <Container
-        sx={{
-          flexGrow: 1,
-        }}
-      >
+      <Container sx={{ flexGrow: 1 }}>
         <Typography
           variant="h3"
           sx={{
             fontFamily: "Lora",
             fontWeight: "bold",
             textAlign: "center",
-            color: "#808080", // Add your desired color here
-            marginTop: "20px", // Add your desired margin top value here
+            color: "#808080",
+            mt: 2, // Used shorthand for margin-top
           }}
         >
           F.A.M.A.P

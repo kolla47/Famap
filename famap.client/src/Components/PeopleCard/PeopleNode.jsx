@@ -1,74 +1,73 @@
 import { Handle, Position } from "reactflow";
-import PeopleCard from "./PeopleCard"; // Import your custom PeopleCard component
+import PeopleCard from "./PeopleCard";
 import { Box } from "@mui/material";
 
-const PeopleNode = (props) => {
-  const personData = props.data;
+const PeopleNode = ({ data: personData }) => {
+  // Determine handle scale based on number of children
   const childrenHandleScale =
-    personData.gender == "Male"
-      ? 100 / (personData.fatherOf.length + 1)
-      : 100 / (personData.motherOf.length + 1);
+    100 /
+    (Math.max(
+      (personData.gender === "Male" ? personData.fatherOf : personData.motherOf)
+        .length,
+      1
+    ) +
+      1);
 
-  const GetChildHandles = (data) => {
-    if (data.length > 0) {
-      return data.map((child, index) => (
-        <Handle
-          id={"P-" + personData.id + "-" + "C-" + child.id}
-          key={"P-" + personData.id + "-" + "C-" + child.id}
-          type="source"
-          position={Position.Bottom}
-          style={{
-            background: "#555",
-            left: `${childrenHandleScale * (index + 1)}%`,
-          }}
-        />
-      ));
-    }
-  };
+  // Generate handles for children
+  const GetChildHandles = (children) =>
+    children.length > 0 &&
+    children.map((child, index) => (
+      <Handle
+        id={`P-${personData.id}-C-${child.id}`}
+        key={`P-${personData.id}-C-${child.id}`}
+        type="source"
+        position={Position.Bottom}
+        style={{
+          background: "#555",
+          left: `${childrenHandleScale * (index + 1)}%`,
+        }}
+      />
+    ));
 
   return (
     <Box style={{ width: 250, height: "auto", padding: 8 }}>
-      {personData.motherId != null ? (
+      {/* Handle for Mother ID */}
+      {personData.motherId && (
         <Handle
-          id={"MC-" + personData.id}
+          id={`MC-${personData.id}`}
           type="target"
           position={Position.Top}
           style={{ background: "#555", left: "33%" }}
         />
-      ) : null}
-      {personData.fatherId != null ? (
+      )}
+      {/* Handle for Father ID */}
+      {personData.fatherId && (
         <Handle
-          id={"FC-" + personData.id}
+          id={`FC-${personData.id}`}
           type="target"
           position={Position.Top}
           style={{ background: "#555", left: "66%" }}
         />
-      ) : null}
+      )}
+      {/* PeopleCard Component */}
       <PeopleCard person={personData} />
+      {/* Handles for Children */}
       {GetChildHandles(personData.motherOf)}
       {GetChildHandles(personData.fatherOf)}
-      {personData.spouseId != null ? (
-        personData.gender == "Male" ? (
-          <Box>
-            <Handle
-              id={"H-" + personData.id}
-              type="source"
-              position={Position.Right}
-              style={{ background: "#555" }}
-            />
-          </Box>
-        ) : (
-          <Box>
-            <Handle
-              id={"W-" + personData.id}
-              type="target"
-              position={Position.Left}
-              style={{ background: "#555" }}
-            />
-          </Box>
-        )
-      ) : (
-        <></>
+      {/* Handle for Spouse */}
+      {personData.spouseId && (
+        <Handle
+          id={
+            personData.gender === "Male"
+              ? `H-${personData.id}`
+              : `W-${personData.id}`
+          }
+          type={personData.gender === "Male" ? "source" : "target"}
+          position={
+            personData.gender === "Male" ? Position.Right : Position.Left
+          }
+          style={{ background: "#555" }}
+        />
       )}
     </Box>
   );
